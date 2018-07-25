@@ -1,0 +1,6 @@
+framework module Pods_FlixTPMTests {
+  umbrella header "Pods-FlixTPMTests-umbrella.h"
+
+  export *
+  module * { export * }
+}
