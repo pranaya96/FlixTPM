@@ -19,7 +19,8 @@ class NowPlayingViewController: UIViewController,UITableViewDataSource,UISearchB
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.dataSource = self
-        tableView.rowHeight = 200
+        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.estimatedRowHeight = 200
         refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector (NowPlayingViewController.didPullToRefresh(_:)), for: .valueChanged)
         self.tableView.addSubview(refreshControl)
