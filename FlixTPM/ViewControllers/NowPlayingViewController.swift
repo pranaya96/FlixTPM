@@ -11,7 +11,7 @@ import AlamofireImage
 
 class NowPlayingViewController: UIViewController,UITableViewDataSource,UISearchBarDelegate {
     
-    var movies:[[String:Any]] = []
+    var movies:[Movie] = []
    
     var refreshControl = UIRefreshControl()
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
@@ -33,32 +33,41 @@ class NowPlayingViewController: UIViewController,UITableViewDataSource,UISearchB
     
     func fetchNowPlayingMovies(){
         // Start the activity indicator
+        self.activityIndicator.startAnimating()
 
-        let url = URL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed")!
-        let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
-        let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
-        let task = session.dataTask(with: request) { (data, response, error) in
-            // This will run when the network request returns
-            if let error = error {
-                print(error.localizedDescription)
-                // create an OK action
-                self.showAlert()
-                self.refreshControl.endRefreshing()
-                self.activityIndicator.stopAnimating()
-                self.fetchNowPlayingMovies()
-                    // optional code for what happens after the alert controller has finished presenting
-                
-            } else if let data = data {
-                let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
-                let movies = dataDictionary["results"] as! [[String:Any]]
+//        let url = URL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed")!
+//        let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
+//        let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
+//        let task = session.dataTask(with: request) { (data, response, error) in
+//            // This will run when the network request returns
+//            if let error = error {
+//                print(error.localizedDescription)
+//                // create an OK action
+//                self.showAlert()
+//                self.refreshControl.endRefreshing()
+//                self.activityIndicator.stopAnimating()
+//                self.fetchNowPlayingMovies()
+//                    // optional code for what happens after the alert controller has finished presenting
+//
+//            } else if let data = data {
+//                let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
+//                let movies = dataDictionary["results"] as! [[String:Any]]
+//                self.movies = movies
+//                self.tableView.reloadData()
+//                self.refreshControl.endRefreshing()
+//                // Start the activity indicator
+//                self.activityIndicator.stopAnimating()
+//            }
+//        }
+//        task.resume()
+        MovieApiManager().popularMovies { (movies: [Movie]?, error: Error?) in
+            if let movies = movies {
                 self.movies = movies
                 self.tableView.reloadData()
                 self.refreshControl.endRefreshing()
-                // Start the activity indicator
                 self.activityIndicator.stopAnimating()
             }
         }
-        task.resume()
         
     }
     
@@ -74,37 +83,39 @@ class NowPlayingViewController: UIViewController,UITableViewDataSource,UISearchB
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell") as! MovieCell
         
-        let movie = movies[indexPath.row]
-        let title = movie["title"] as! String
-        let overview = movie["overview"] as! String
-        cell.titleLabel.text = title
-        cell.overviewLabel.text = overview
+        cell.movie = movies[indexPath.row]
         
-    
-        let placeholderImage = UIImage(named: "placeholder")!
-        
-        let posterPathString = movie["poster_path"] as! String
-        let baseURLString = "https://image.tmdb.org/t/p/w500"
-        let posterURL = URL(string: baseURLString+posterPathString)!
-       
-        
-        let filter = AspectScaledToFillSizeWithRoundedCornersFilter(
-            size: cell.posterImageView.frame.size,
-            radius: 20.0
-        )
-        
-        cell.posterImageView.af_setImage(
-            withURL: posterURL,
-            placeholderImage: placeholderImage,
-            filter: filter,
-            imageTransition: .crossDissolve(0.2)
-        )
-        // No color when the user selects cell
-        //cell.selectionStyle = .none
-        
-        let backgroundView = UIView()
-        backgroundView.backgroundColor = UIColor.lightGray
-        cell.selectedBackgroundView = backgroundView
+//        let movie = movies[indexPath.row]
+//        let title = movie["title"] as! String
+//        let overview = movie["overview"] as! String
+//        cell.titleLabel.text = title
+//        cell.overviewLabel.text = overview
+//
+//
+//        let placeholderImage = UIImage(named: "placeholder")!
+//
+//        let posterPathString = movie["poster_path"] as! String
+//        let baseURLString = "https://image.tmdb.org/t/p/w500"
+//        let posterURL = URL(string: baseURLString+posterPathString)!
+//
+//
+//        let filter = AspectScaledToFillSizeWithRoundedCornersFilter(
+//            size: cell.posterImageView.frame.size,
+//            radius: 20.0
+//        )
+//
+//        cell.posterImageView.af_setImage(
+//            withURL: posterURL,
+//            placeholderImage: placeholderImage,
+//            filter: filter,
+//            imageTransition: .crossDissolve(0.2)
+//        )
+//        // No color when the user selects cell
+//        //cell.selectionStyle = .none
+//
+//        let backgroundView = UIView()
+//        backgroundView.backgroundColor = UIColor.lightGray
+//        cell.selectedBackgroundView = backgroundView
         
         return cell
     }

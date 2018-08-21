@@ -11,7 +11,7 @@ import AlamofireImage
 
 
 class DetailViewController: UIViewController {
-    var movie:[String:Any]?
+    var movie:Movie?
     var trailerKey:String?
     @IBOutlet weak var overviewLabel: UILabel!
     @IBOutlet weak var releaseDateLabel: UILabel!
@@ -23,20 +23,34 @@ class DetailViewController: UIViewController {
         
         fetchTrailer()
         
+//        if let movie = movie{
+//            titleLabel.text = movie["title"] as? String
+//            releaseDateLabel.text = movie["release_date"] as? String
+//            overviewLabel.text = movie["overview"] as? String
+//            let backdropPathString = movie["backdrop_path"] as! String
+//            let posterPathString = movie["poster_path"] as! String
+//            let baseURLString = "https://image.tmdb.org/t/p/w500"
+//            let backdropURL = URL(string: baseURLString+backdropPathString)!
+//            backdropImageView.af_setImage(withURL:backdropURL)
+//
+//            let posterPathURL = URL(string: baseURLString+posterPathString)!
+//            posterImageView.af_setImage(withURL:posterPathURL)
+//
+//
+//
+//        }
+        
         if let movie = movie{
-            titleLabel.text = movie["title"] as? String
-            releaseDateLabel.text = movie["release_date"] as? String
-            overviewLabel.text = movie["overview"] as? String
-            let backdropPathString = movie["backdrop_path"] as! String
-            let posterPathString = movie["poster_path"] as! String
-            let baseURLString = "https://image.tmdb.org/t/p/w500"
-            let backdropURL = URL(string: baseURLString+backdropPathString)!
-            backdropImageView.af_setImage(withURL:backdropURL)
+            titleLabel.text = movie.title
+            releaseDateLabel.text = movie.releaseDate
+            overviewLabel.text =  movie.overview
+            if movie.posterUrl != nil {
+                posterImageView.af_setImage(withURL: movie.posterUrl!)
+            }
+            if movie.backdropUrl != nil {
+                backdropImageView.af_setImage(withURL: movie.backdropUrl!)
+            }
             
-            let posterPathURL = URL(string: baseURLString+posterPathString)!
-            posterImageView.af_setImage(withURL:posterPathURL)
-            
-
             
         }
         
@@ -58,8 +72,8 @@ class DetailViewController: UIViewController {
     func fetchTrailer(){
         // Start the activity indicator
         if let movie = movie{
-            let movieId = movie["id"] as! Int
-            let baseTrailerUrl = "https://api.themoviedb.org/3/movie/\(movieId)/videos?api_key=f72e93d33e6f6d3be2c2a88feb31613a&language=en-US"
+            let movieId = movie.id
+            let baseTrailerUrl = "https://api.themoviedb.org/3/movie/\(movieId ?? 0)/videos?api_key=f72e93d33e6f6d3be2c2a88feb31613a&language=en-US"
             let url = URL(string: baseTrailerUrl)!
             let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
             let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
